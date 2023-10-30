@@ -1,0 +1,6 @@
+spring:
+    datasource:
+        driverClassName: org.h2.Driver
+        password: test
+        url: jdbc:h2:mem:recommendservice
+        username: test

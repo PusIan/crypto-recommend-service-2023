@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13.7-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - /var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=recommendservice
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+
+  batchloader:
+    build: batchloader/
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=recommendservice
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=db
+      - DB_PORT=5432
+
+  api:
+    build: api/
+    ports:
+      - "9090:9090"
+    depends_on:
+      - batchloader
+    environment:
+      - DB_NAME=recommendservice
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=db
+      - DB_PORT=5432
+
+

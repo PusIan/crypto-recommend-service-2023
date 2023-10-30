@@ -1,0 +1,46 @@
+logging:
+    level:
+        org:
+            zalando:
+                logbook: TRACE
+server:
+    port: 9090
+spring:
+    cache:
+        cache-names: buckets
+        caffeine:
+            spec: maximumSize=1000000,expireAfterAccess=600s
+    datasource:
+        driverClassName: org.postgresql.Driver
+        password: ${POSTGRES_PASSWORD}
+        url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+        username: ${POSTGRES_USER}
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQL10Dialect
+                format_sql: true
+    mvc:
+        format:
+            date: yyyy-MM-dd
+            date-time: yyyy-MM-dd HH:mm:ss
+            time: HH:mm:ss
+        pathmatch:
+            matching-strategy: ANT_PATH_MATCHER
+    sql:
+        init:
+            mode: always
+
+bucket4j:
+    enabled: true
+    filters:
+        - cache-name: buckets
+          url: /recommend(/|\?)?.*
+          rate-limits:
+              - expression: "@securityService.getClientIP(#this)"
+                bandwidths:
+                    - capacity: 1
+                      time: 5
+                      unit: seconds
